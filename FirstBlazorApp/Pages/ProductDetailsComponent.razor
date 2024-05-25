@@ -1,0 +1,51 @@
+﻿@page "/ProductDetails/{Id:int}"
+@inject IService<Product> ProductService
+@inject IService<Category> CategoryService
+@inject NavigationManager Navigation
+
+<div class="container">
+    <h3 class="text-center mb-4">Product Details</h3>
+
+    @if (product != null)
+    {
+        <div class="row">
+            <div class="col-md-6">
+                <img src="Images/@product.ImageUrl" alt="@product.Title" class="img-fluid rounded" />
+            </div>
+            <div class="col-md-6">
+                <h4>@product.Title</h4>
+                <p><strong>Price:</strong> $@product.Price</p>
+                <p><strong>Quantity:</strong> @product.Quantity</p>
+                <p><strong>Category:</strong> @GetCategoryName(product.CategoryId)</p>
+                <button class="btn btn-outline-primary rounded-pill mb-3 px-3" @onclick="BackToList">Back</button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p>Loading...</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Product product;
+
+    protected override void OnInitialized()
+    {
+        product = ProductService.GetById(Id);
+    }
+
+    private string GetCategoryName(int categoryId)
+    {
+        var category = CategoryService.GetById(categoryId);
+        return category != null ? category.Name : "Not Found";
+    }
+
+    private void BackToList()
+    {
+        Navigation.NavigateTo("/Products");
+    }
+}

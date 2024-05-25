@@ -1,0 +1,76 @@
+﻿@page "/ProductEdit/{Id:int}"
+@inject IService<Product> ProductService
+@inject IService<Category> CategoryService
+@inject NavigationManager Navigation
+
+<div class="container">
+    <h3 class="text-center mb-4">Product Details</h3>
+
+    @if (product != null)
+    {
+        <EditForm Model="@product" OnValidSubmit="@UpdateProduct">
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="images/@product.ImageUrl" alt="@product.Title" class="img-fluid rounded" />
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label>Title:</label>
+                        <InputText @bind-Value="@product.Title" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label>Price:</label>
+                        <InputNumber @bind-Value="@product.Price" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label>Quantity:</label>
+                        <InputNumber @bind-Value="@product.Quantity" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label>Category:</label>
+                        <InputSelect @bind-Value="@product.CategoryId" class="form-control">
+                            @foreach (var category in categories)
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    <!-- Add more product details here -->
+                    <button type="submit" class="btn btn-outline-success rounded-pill mb-3 px-3">Save Changes</button>
+                    <button class="btn btn-outline-secondary rounded-pill mb-3 px-3" @onclick="CancelEdit">Cancel</button>
+                </div>
+            </div>
+        </EditForm>
+    }
+    else
+    {
+        <p>Loading...</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Product product;
+    private List<Category> categories;
+
+    protected override void OnInitialized()
+    {
+        product = ProductService.GetById(Id);
+        categories = CategoryService.GetAll();
+    }
+
+    private async Task UpdateProduct()
+    {
+        // Save changes to the product
+
+        Navigation.NavigateTo($"/Products");
+    }
+
+    private void CancelEdit()
+    {
+        // Redirect back to the product details page without saving changes
+        Navigation.NavigateTo($"/Products");
+    }
+}
